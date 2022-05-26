@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <title>Receiver_Guy</title>
+    <link rel="stylesheet"
+          href="./style.css"
+          type="text/css">
+</head>
+
+<body style="background-color: rgba(255, 228, 225, 0.8);">
+    <center>
+        <h1><strong>RECEIVER</strong></h1>
+    </center>
+
+    <div id="description">
+        <textarea class="item"
+                  id="offer"
+                  placeholder="OFFER"
+                  spellcheck="false"></textarea>
+        <textarea class="item"
+                  id="answer"
+                  placeholder="ANSWER"
+                  spellcheck="false"></textarea>
+    </div>
+
+    <div id="chat">
+        <textarea class="outgoing"
+                  readonly
+                  spellcheck="false"></textarea>
+        <textarea class="incoming"
+                  readonly
+                  spellcheck="false"></textarea>
+    </div>
+
+    <div>
+        <input type="text"
+               placeholder="message"
+               id="message">
+        <button id="send">Send</button>
+    </div>
+
+    <script>
+        let flag = false; // messaging is disabled
+        const offerBox = document.querySelector("#offer");
+        const answerBox = document.querySelector("#answer");
+        const inBox = document.querySelector(".incoming");
+        const outBox = document.querySelector(".outgoing");
+        const messageBox = document.querySelector("#message");
+        const sendButton = document.querySelector("#send");
+
+        const localConnection = new RTCPeerConnection();
+
+        // adding event listeners for icecandidate
+        localConnection.addEventListener('icecandidate', (event) => {
+            answerBox.value = JSON.stringify(localConnection.localDescription);
+            answerBox.setAttribute('readonly', 'true');
+        });
+
+        // capturing the created datachannel
+        let dataChannel = null;
+        localConnection.ondatachannel = (Event) => {
+            dataChannel = Event.channel;
+            dataChannel.onopen = (event) => {
+                flag = true;
+                console.log("Receiver: channel opened");
+            };
+            dataChannel.onclose = (event) => {
+                flag = false;
+                console.log("Receiver: channel closed")
+            };
+            dataChannel.onmessage = (event) => {
+                inBox.innerHTML += event.data + '\n';
+            };
+        };
+
+        offerBox.onchange = (event) => {
+            const offer = JSON.parse(offerBox.value);
+            offerBox.setAttribute('readonly', 'true');
+
+            // accepting the offer
+            localConnection.setRemoteDescription(offer).then(() => { console.log("Receiver: offer accepted") });
+
+            // creating the answer
+            localConnection.createAnswer().then((answer) => localConnection.setLocalDescription(answer)).then(() => { console.log("Receiver: answer initiated") });
+        };
+
+        sendButton.onclick = (event) => {
+            if (messageBox.value != null && messageBox.value != '' && flag) {
+                dataChannel.send(messageBox.value);
+                outBox.innerHTML += messageBox.value + '\n';
+                messageBox.value = '';
+            }
+        }
+    </script>
+</body>
+
+</html>

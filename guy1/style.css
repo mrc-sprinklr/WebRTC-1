@@ -1,0 +1,79 @@
+#description {
+    display: flex;
+    margin: 25px 75px;
+    height: 12vh;
+    justify-content: center;
+}
+
+.item {
+    margin: 5px;
+    padding: 5px;
+    width: 100%;
+    height: 100%;
+    font-size: 12px;
+    text-align: center;
+    resize: none;
+    border: 2px solid dodgerblue;
+    border-radius: 5px;
+}
+
+#chat {
+    display: flex;
+    margin: 40px 80px;
+    height: 55vh;
+    justify-content: center;
+}
+
+.outgoing {
+    margin: 10px;
+    padding: 25px;
+    width: 100%;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    resize: none;
+    background-color: rgba(100, 255, 100, 0.5);
+    border-radius: 25px;
+    border: transparent;
+}
+
+.incoming {
+    margin: 10px;
+    padding: 25px;
+    width: 100%;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    resize: none;
+    background-color: rgba(255, 100, 100, 0.5);
+    border-radius: 25px;
+    border: transparent;
+}
+
+#message {
+    margin: 0 20px 0 80px;
+    padding: 5px;
+    width: 40%;
+    font-size: 16px;
+    text-align: center;
+    border: 2px solid dodgerblue;
+    border-radius: 5px;
+}
+
+#send {
+    width: 80px;
+    padding: 8px 2px;
+    font-size: 18px;
+    text-align: center;
+
+    transition: all 0.5s;
+    background-color: white;
+    color: dodgerblue;
+    border-radius: 5%;
+}
+
+#send:hover {
+    background-color: dodgerblue;
+    color: white;
+    border-radius: 5% 50% 50% 5%;
+}

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <title>Sender_Guy</title>
+    <link rel="stylesheet"
+          href="./style.css"
+          type="text/css">
+</head>
+
+<body style="background-color: rgba(152, 251, 152, 0.4);">
+    <center>
+        <h1><strong>SENDER</strong></h1>
+    </center>
+
+    <div id="description">
+        <textarea class="item"
+                  id="offer"
+                  placeholder="OFFER"
+                  spellcheck="false"></textarea>
+        <textarea class="item"
+                  id="answer"
+                  placeholder="ANSWER"
+                  spellcheck="false"></textarea>
+    </div>
+
+    <div id="chat">
+        <textarea class="outgoing"
+                  readonly
+                  spellcheck="false"></textarea>
+        <textarea class="incoming"
+                  readonly
+                  spellcheck="false"></textarea>
+    </div>
+
+    <div>
+        <input type="text"
+               placeholder="message"
+               id="message">
+        <button id="send">Send</button>
+    </div>
+
+    <script>
+        let flag = false; // messaging is disabled
+        const offerBox = document.querySelector("#offer");
+        const answerBox = document.querySelector("#answer");
+        const inBox = document.querySelector(".incoming");
+        const outBox = document.querySelector(".outgoing");
+        const messageBox = document.querySelector("#message");
+        const sendButton = document.querySelector("#send");
+
+        const localConnection = new RTCPeerConnection();
+
+        // adding event listeners for icecandidate
+        localConnection.addEventListener('icecandidate', (event) => {
+            offerBox.value = JSON.stringify(localConnection.localDescription);
+            offerBox.setAttribute('readonly', 'true');
+        });
+
+        // creating a new datachannel
+        const dataChannel = localConnection.createDataChannel("channel");
+        dataChannel.onopen = (event) => {
+            flag = true;
+            console.log("Sender: channel opened");
+        };
+        dataChannel.onclose = (event) => {
+            flag = false;
+            console.log("Sender: channel closed")
+        };
+        dataChannel.onmessage = (event) => {
+            inBox.innerHTML += event.data + '\n';
+        };
+
+        // creating an offer for the new datachannel
+        localConnection.createOffer().then(offer => { localConnection.setLocalDescription(offer) }).then(() => { console.log("Sender: offer initiated") });
+
+        answerBox.onchange = (event) => {
+            const answer = JSON.parse(answerBox.value);
+            answerBox.setAttribute('readonly', 'true');
+
+            // accepting the answer
+            localConnection.setRemoteDescription(answer).then(() => { console.log("Sender: answer accepted") });
+        };
+
+        sendButton.onclick = (event) => {
+            if (messageBox.value != null && messageBox.value != '' && flag) {
+                dataChannel.send(messageBox.value);
+                outBox.innerHTML += messageBox.value + '\n';
+                messageBox.value = '';
+            }
+        }
+    </script>
+</body>
+
+</html>
