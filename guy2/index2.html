@@ -53,17 +53,22 @@
         const sendButton = document.querySelector("#send");
 
         const iceconfig = [
-            { 'url': "stun:stun.l.google.com:19302?transport = udp" },
-            { 'url': "stun:stun1.l.google.com:19302?transport = udp" },
-            { 'url': "stun:stun2.l.google.com:19302?transport = udp" },
-            { 'url': "stun:stun3.l.google.com:19302?transport = udp" },
-            { 'url': "stun:stun4.l.google.com:19302?transport = udp" }];
+            { 'url': "stun:stun.l.google.com:19302?transport=udp" },
+            { 'url': "stun:stun1.l.google.com:19302?transport=udp" },
+            { 'url': "stun:stun2.l.google.com:19302?transport=udp" },
+            { 'url': "stun:stun3.l.google.com:19302?transport=udp" },
+            { 'url': "stun:stun4.l.google.com:19302?transport=udp" }];
         const localConnection = new RTCPeerConnection(iceconfig);
 
         // adding event listeners for icecandidate
-        let SDP = null;
         localConnection.addEventListener('icecandidate', (event) => {
-            SDP = JSON.stringify(localConnection.localDescription);
+            if (event.candidate)
+                console.log('new icecandidate');
+            else setTimeout(() => {
+                console.log('no more icecandidate');
+                answerBox.value = JSON.stringify(localConnection.localDescription);
+                answerBox.setAttribute('readonly', 'true');
+            }, 100);
         });
 
         // capturing the created datachannel
@@ -92,12 +97,6 @@
 
             // creating the answer
             localConnection.createAnswer().then((answer) => localConnection.setLocalDescription(answer)).then(() => { console.log("Receiver: answer initiated") });
-
-            // assuming ice-search is complete and showing final SDP
-            setTimeout(() => {
-                answerBox.value = SDP;
-                answerBox.setAttribute('readonly', 'true');
-            }, 1000);
         };
 
         sendButton.onclick = (event) => {

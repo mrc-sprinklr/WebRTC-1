@@ -53,17 +53,22 @@
         const sendButton = document.querySelector("#send");
 
         const iceconfig = [
-            { 'url': "stun:stun.l.google.com:19302?transport = udp" },
-            { 'url': "stun:stun1.l.google.com:19302?transport = udp" },
-            { 'url': "stun:stun2.l.google.com:19302?transport = udp" },
-            { 'url': "stun:stun3.l.google.com:19302?transport = udp" },
-            { 'url': "stun:stun4.l.google.com:19302?transport = udp" }];
+            { 'url': "stun:stun.l.google.com:19302?transport=udp" },
+            { 'url': "stun:stun1.l.google.com:19302?transport=udp" },
+            { 'url': "stun:stun2.l.google.com:19302?transport=udp" },
+            { 'url': "stun:stun3.l.google.com:19302?transport=udp" },
+            { 'url': "stun:stun4.l.google.com:19302?transport=udp" }];
         const localConnection = new RTCPeerConnection(iceconfig);
 
         // adding event listeners for icecandidate
-        let SDP = null;
         localConnection.addEventListener('icecandidate', (event) => {
-            SDP = JSON.stringify(localConnection.localDescription);
+            if (event.candidate)
+                console.log('new icecandidate');
+            else setTimeout(() => {
+                console.log('no more icecandidate');
+                offerBox.value = JSON.stringify(localConnection.localDescription);
+                offerBox.setAttribute('readonly', 'true');
+            }, 100);
         });
 
         // creating a new datachannel
@@ -82,12 +87,6 @@
 
         // creating an offer for the new datachannel
         localConnection.createOffer().then(offer => { localConnection.setLocalDescription(offer) }).then(() => { console.log("Sender: offer initiated") });
-
-        // assuming ice-search is complete and showing final SDP
-        setTimeout(() => {
-            offerBox.value = SDP;
-            offerBox.setAttribute('readonly', 'true');
-        }, 1000);
 
         answerBox.onchange = (event) => {
             const answer = JSON.parse(answerBox.value);
