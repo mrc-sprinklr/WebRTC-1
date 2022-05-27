@@ -81,10 +81,14 @@
             };
             dataChannel.onclose = (event) => {
                 flag = false;
-                console.log("Receiver: channel closed")
+                console.log("Receiver: channel closed");
             };
             dataChannel.onmessage = (event) => {
                 inBox.innerHTML += event.data + '\n';
+            };
+            dataChannel.onerror = (event) => {
+                flag = false;
+                console.log("Receiver: error while opening channel");
             };
         };
 

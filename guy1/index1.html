@@ -79,10 +79,14 @@
         };
         dataChannel.onclose = (event) => {
             flag = false;
-            console.log("Sender: channel closed")
+            console.log("Sender: channel closed");
         };
         dataChannel.onmessage = (event) => {
             inBox.innerHTML += event.data + '\n';
+        };
+        dataChannel.onerror = (event) => {
+            flag = false;
+            console.log("Sender: error while opening channel");
         };
 
         // creating an offer for the new datachannel
