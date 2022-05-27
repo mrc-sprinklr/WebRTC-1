@@ -52,12 +52,18 @@
         const messageBox = document.querySelector("#message");
         const sendButton = document.querySelector("#send");
 
-        const localConnection = new RTCPeerConnection();
+        const iceconfig = [
+            { 'url': "stun:stun.l.google.com:19302?transport = udp" },
+            { 'url': "stun:stun1.l.google.com:19302?transport = udp" },
+            { 'url': "stun:stun2.l.google.com:19302?transport = udp" },
+            { 'url': "stun:stun3.l.google.com:19302?transport = udp" },
+            { 'url': "stun:stun4.l.google.com:19302?transport = udp" }];
+        const localConnection = new RTCPeerConnection(iceconfig);
 
         // adding event listeners for icecandidate
+        let SDP = null;
         localConnection.addEventListener('icecandidate', (event) => {
-            offerBox.value = JSON.stringify(localConnection.localDescription);
-            offerBox.setAttribute('readonly', 'true');
+            SDP = JSON.stringify(localConnection.localDescription);
         });
 
         // creating a new datachannel
@@ -76,6 +82,12 @@
 
         // creating an offer for the new datachannel
         localConnection.createOffer().then(offer => { localConnection.setLocalDescription(offer) }).then(() => { console.log("Sender: offer initiated") });
+
+        // assuming ice-search is complete and showing final SDP
+        setTimeout(() => {
+            offerBox.value = SDP;
+            offerBox.setAttribute('readonly', 'true');
+        }, 1000);
 
         answerBox.onchange = (event) => {
             const answer = JSON.parse(answerBox.value);
