@@ -27,6 +27,13 @@
                   spellcheck="false"></textarea>
     </div>
 
+    <div id="upper-buttons">
+        <button class="submit"
+                id="generate">Generate Offer</button>
+        <button class="submit"
+                id="confirm">Confirm Answer</button>
+    </div>
+
     <div id="chat">
         <textarea class="outgoing"
                   readonly
@@ -44,13 +51,17 @@
     </div>
 
     <script>
-        let flag = false; // messaging is disabled
         const offerBox = document.querySelector("#offer");
         const answerBox = document.querySelector("#answer");
         const inBox = document.querySelector(".incoming");
         const outBox = document.querySelector(".outgoing");
         const messageBox = document.querySelector("#message");
         const sendButton = document.querySelector("#send");
+        const generateButton = document.querySelector("#generate");
+        const confirmButton = document.querySelector("#confirm");
+
+        let flag = false; // messaging is disabled
+        confirmButton.disabled = true;
 
         const configuration = { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] };
         const localConnection = new RTCPeerConnection(configuration);
@@ -81,18 +92,25 @@
         };
         dataChannel.onerror = (event) => {
             flag = false;
-            console.log("Sender: error while opening channel");
+            console.log("Sender: some error occured");
         };
 
-        // creating an offer for the new datachannel
-        localConnection.createOffer().then(offer => { localConnection.setLocalDescription(offer) }).then(() => { console.log("Sender: offer initiated") });
+        generateButton.onclick = (event) => {
+            // creating an offer for the new datachannel
+            localConnection.createOffer().then(offer => { localConnection.setLocalDescription(offer) }).then(() => { console.log("Sender: offer initiated") });
 
-        answerBox.onchange = (event) => {
+            confirmButton.disabled = false;
+            generateButton.disabled = true;
+        };
+
+        confirmButton.onclick = (event) => {
             const answer = JSON.parse(answerBox.value);
             answerBox.setAttribute('readonly', 'true');
 
             // accepting the answer
             localConnection.setRemoteDescription(answer).then(() => { console.log("Sender: answer accepted") });
+
+            confirmButton.disabled = true;
         };
 
         sendButton.onclick = (event) => {

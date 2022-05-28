@@ -27,6 +27,13 @@
                   spellcheck="false"></textarea>
     </div>
 
+    <div id="upper-buttons">
+        <button class="submit"
+                id="confirm">Confirm Offer</button>
+        <button class="submit"
+                id="generate">Generate Answer</button>
+    </div>
+
     <div id="chat">
         <textarea class="outgoing"
                   readonly
@@ -44,13 +51,17 @@
     </div>
 
     <script>
-        let flag = false; // messaging is disabled
         const offerBox = document.querySelector("#offer");
         const answerBox = document.querySelector("#answer");
         const inBox = document.querySelector(".incoming");
         const outBox = document.querySelector(".outgoing");
         const messageBox = document.querySelector("#message");
         const sendButton = document.querySelector("#send");
+        const confirmButton = document.querySelector("#confirm");
+        const generateButton = document.querySelector("#generate");
+
+        let flag = false; // messaging is disabled
+        generateButton.disabled = true;
 
         const configuration = { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] };
         const localConnection = new RTCPeerConnection(configuration);
@@ -87,15 +98,22 @@
             };
         };
 
-        offerBox.onchange = (event) => {
+        confirmButton.onclick = (event) => {
             const offer = JSON.parse(offerBox.value);
             offerBox.setAttribute('readonly', 'true');
 
             // accepting the offer
             localConnection.setRemoteDescription(offer).then(() => { console.log("Receiver: offer accepted") });
 
+            generateButton.disabled = false;
+            confirmButton.disabled = true;
+        };
+
+        generateButton.onclick = (event) => {
             // creating the answer
             localConnection.createAnswer().then((answer) => localConnection.setLocalDescription(answer)).then(() => { console.log("Receiver: answer initiated") });
+
+            generateButton.disabled = true;
         };
 
         sendButton.onclick = (event) => {

@@ -17,10 +17,36 @@
     border-radius: 5px;
 }
 
+#upper-buttons {
+    display: flex;
+    margin: 25px 75px;
+    padding: 10px;
+    justify-content: center;
+}
+
+.submit {
+    margin: 0 auto;
+    padding: 5px 25px;
+    font-size: 16px;
+    text-align: center;
+    background-color: rgba(30, 144, 255, 0.8);
+    color: white;
+    border: 2px solid navy;
+    border-radius: 50px;
+}
+
+.submit:hover {
+    background-color: dodgerblue;
+}
+
+.submit:disabled {
+    visibility: hidden;
+}
+
 #chat {
     display: flex;
-    margin: 40px 80px;
-    height: 55vh;
+    margin: 25px 80px;
+    height: 45vh;
     justify-content: center;
 }
 
